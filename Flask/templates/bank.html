@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Bank{% endblock %}
+
+{% block content %}
+<div class="container flex-grow-1">
+    <div class="row justify-content-center mt-5 mb-3">
+        <div class="col-md-6">
+            <h1 class="text-center">Sprawdź stan konta</h1>
+            <p class="text-center">Aby sprawdzić stan swojego konta, wprowadź numer karty płatniczej.</p>
+
+            <form method="POST" class="mt-5 p-4 bg-light rounded card shadow-sm">
+                <div class="mb-3">
+                    <label for="cardNumber" class="form-label">Numer karty płatniczej</label>
+                    <input type="text" pattern="\d{12}" name="cardNumber" class="form-control" id="cardNumberAdd" placeholder="1234-5678-9012" value="{{ request.form['cardNumber'] if request.method == 'POST' else '' }}" maxlength="12">
+                </div>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">Sprawdź stan konta</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if request.method == 'POST' %}
+        {% if balance %}
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="alert text-center fs-4" role="alert">
+                        <i class="bi bi-currency-exchange"></i> Dostępne środki na twoim koncie: <strong>{{ balance }}</strong>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <p class="text-center text-danger">Podano nieprawidłowy numer karty</p>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}

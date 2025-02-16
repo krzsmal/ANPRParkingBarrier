@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Historia{% endblock %}
+
+{% block content %}
+<div class="container flex-grow-1">
+    <div class="row justify-content-center mt-5 mb-3">
+        <div class="col-md-6">
+            <h1 class="text-center">Historia odwiedzin parkingu</h1>
+            <p class="text-center">Aby sprawdzić swoją historię, wprowadź numer rejestracyjny poniżej.</p>
+            <form method="POST" class="mt-5 p-4 bg-light rounded card shadow-sm">
+                <div class="mb-3">
+                    <label for="plateNumber" class="form-label">Numer rejestracyjny</label>
+                    <input type="text" name="plateNumber" class="form-control" id="plateNumber" placeholder="ERA75TM" value="{{ request.form['plateNumber'] if request.method == 'POST' else '' }}" pattern="[A-Za-z0-9]*" maxlength="8" oninput="this.value = this.value.toUpperCase();">
+                </div>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">Sprawdź historię</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% if request.method == 'POST' %}
+        {% if rows or last %}
+            <hr class="mt-5" style="margin-bottom: 23px;">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="alert text-center fs-4" role="alert">
+                        <i class="bi bi-hourglass-split"></i> Całkowity czas spędzony na parkingu: <strong>{{ total_duration }}</strong>
+                    </div>
+                    {% for row in rows %}
+                        <div class="card my-3">
+                            <div class="card-body shadow-sm">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="card-title mb-0"><i class="bi bi-box-arrow-in-right text-primary"></i> Wjazd</h5>
+                                    <span class="badge bg-success fs-6"><i class="bi bi-calendar-event"></i> {{ row['entry_time'] }}</span>
+                                </div>
+                                <hr>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="card-title mb-0"><i class="bi bi-box-arrow-right text-primary"></i> Wyjazd</h5>
+                                    <span class="badge bg-danger fs-6"><i class="bi bi-calendar-event"></i> {{ row['exit_time'] }}</span>
+                                </div>
+                                <hr>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0"><i class="bi bi-clock-history text-primary"></i> Czas trwania</h5>
+                                    <span class="badge bg-info text-dark fs-6">{{ row['duration'] }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    {% if last %}
+                    <div class="card my-3">
+                        <div class="card-body shadow-sm">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="card-title mb-0"><i class="bi bi-box-arrow-in-right text-primary"></i> Wjazd</h5>
+                                <span class="badge bg-success fs-6"><i class="bi bi-calendar-event"></i> {{ last['entry_time'] }}</span>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="card-title mb-0"><i class="bi bi-box-arrow-right text-primary"></i> Wyjazd</h5>
+                                <span class="badge bg-danger fs-6"><i class="bi bi-calendar-event"></i> {{ last['exit_time'] }}</span>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0"><i class="bi bi-clock-history text-primary"></i> Czas trwania</h5>
+                                <span class="badge bg-info text-dark fs-6">{{ last['duration'] }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% else %}
+            <p class="text-center text-danger">Podano nieprawidłowy numer rejestracyjny</p>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,124 @@
+{% extends "admin.html" %}
+
+{% block title %}Zarządzanie powiązaniami{% endblock %}
+
+{% block content %}
+<style>
+    .table td, .table th {
+        vertical-align: middle;
+        text-align: center;
+    }
+    .table input {
+        border: none;
+        background: transparent;
+        outline: none;
+        width: 100%;
+        padding: 0;
+        font-size: inherit;
+        text-align: center;
+    }
+    .table input:focus {
+        outline: none;
+        box-shadow: none;
+    }
+    .table select {
+        border: none;
+        background: transparent;
+        outline: none;
+        width: 100%;
+        padding: 0;
+        font-size: inherit;
+        text-align: center;
+    }
+    .table select:focus {
+        outline: none;
+        box-shadow: none;
+    }
+    .table {
+        border-radius: 0.5rem;
+        overflow: hidden;
+        margin-bottom: 0;
+    }
+    .thead-light th:first-child {
+        border-top-left-radius: 0.5rem;
+    }
+    .thead-light th:last-child {
+        border-top-right-radius: 0.5rem;
+    }
+    .card {
+        padding: 0;
+    }
+</style>
+
+<div class="container flex-grow-1">
+    <div class="row justify-content-center mt-5 mb-3">
+        <div class="col-md-10">
+            <h1 class="text-center mb-5">Zarządzanie powiązaniami</h1>
+            <div class="card rounded shadow-sm mb-4 p-4">
+                <form method="post" class="row g-2 align-items-center d-flex justify-content-between">
+                    <input type="hidden" name="action" value="insert">
+                    <div class="col-md-4">
+                        <input type="text" name="plateNumber" class="form-control" placeholder="Nr. rejestracyjny" required maxlength="8" pattern="[A-Za-z0-9]*" oninput="this.value = this.value.toUpperCase();">
+                    </div>
+                    <div class="col-md-4">
+                        <input type="text" name="cardNumber"  class="form-control" placeholder="Nr. karty" required pattern="\d{12}" maxlength="12">
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100">Dodaj</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card rounded shadow-sm">
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col">Numer rejestracyjny</th>
+                                <th scope="col">Numer karty</th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if rows %}
+                                {% for row in rows %}
+                                    <tr>
+                                        <form method="post">
+                                            <input type="hidden" name="action" value="update">
+                                            <td>
+                                                <input type="text" name="plateNumber" value="{{ row[0] }}" required maxlength="8" pattern="[A-Za-z0-9]*" oninput="this.value = this.value.toUpperCase();">
+                                            </td>
+                                            <td>
+                                                <input type="text" name="cardNumber" value="{{ row[1] }}" required pattern="\d{12}" maxlength="12">
+                                            </td>
+                                            <td class="text-center">
+                                                <button type="submit" class="btn btn-success">
+                                                    <i class="bi bi-pen"></i>
+                                                </button>
+                                            </td>
+                                        </form>
+                                        <form method="post">
+                                            <input type="hidden" name="action" value="delete">
+                                            <input type="hidden" name="plateNumber" value="{{ row[0] }}">
+                                            <td class="text-center">
+                                                <button type="submit" class="btn btn-danger">
+                                                    <i class="bi bi-trash3-fill"></i>
+                                                </button>
+                                            </td>
+                                        </form>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="6" class="text-center">Brak danych do wyświetlenia</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

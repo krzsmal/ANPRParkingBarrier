@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}Statystyki{% endblock %}
+
+{% block nav %}
+<li class="nav-item">
+    <a class="nav-link {% if request.path == '/admin' %}active{% endif %}" href="/admin">Strona główna</a>
+</li>
+<li class="nav-item">
+    <a class="nav-link {% if request.path == '/admin/historia' %}active{% endif %}" href="/admin/historia">Historia parkowania</a>
+</li>
+<li class="nav-item">
+    <a class="nav-link {% if request.path == '/admin/karty' %}active{% endif %}" href="/admin/karty">Rejestracja karty</a>
+</li>
+<li class="nav-item">
+    <a class="nav-link {% if request.path == '/admin/bank' %}active{% endif %}" href="/admin/bank">Bank</a>
+</li>
+<li class="nav-item">
+    <a class="nav-link {% if request.path == '/admin/login' %}active{% endif %}" href="/admin/login">Logowanie</a>
+</li>
+{% endblock %}
+
+{% block content %}
+<div class="container flex-grow-1">
+    <div class="row justify-content-center mt-5 mb-3">
+        <div class="col-md-10">
+            <h1 class="text-center">Statystyki parkingu</h1>
+            <div class="row g-3 mt-4">
+                <div class="col-md-4">
+                    <div class="card text-center p-3 shadow-sm h-100">
+                        <i class="bi bi-box-arrow-in-right icon fs-1 text-success"></i>
+                        <h3 class="mt-2">Wjazdy</h3>
+                        <h3><strong>{{ stats['entries_count'] }}</strong></h3>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card text-center p-3 shadow-sm h-100">
+                        <i class="bi bi-people icon fs-1 text-primary"></i>
+                        <h3 class="mt-2">Klienci</h3>
+                        <h3><strong>{{ stats['cars_count'] }}</strong></h3>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card text-center p-3 shadow-sm h-100">
+                        <i class="bi bi-box-arrow-right icon fs-1 text-danger"></i>
+                        <h3 class="mt-2">Wyjazdy</h3>
+                        <h3><strong>{{ stats['exits_count'] }}</strong></h3>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card text-center p-3 shadow-sm h-100">
+                        <i class="bi bi-car-front icon fs-1 text-info"></i>
+                        <h3 class="mt-2">Auta na parkingu</h3>
+                        <h3><strong>{{ stats['cars_on_parking'] }}</strong></h3>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card text-center p-3 shadow-sm h-100">
+                        <i class="bi bi-hourglass-split icon fs-1 text-secondary"></i>
+                        <h3 class="mt-2">Całkowity czas</h3>
+                        <h3><strong>{{ stats['total_duration'] }}</strong></h3>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card text-center p-3 shadow-sm h-100">
+                        <i class="bi bi-clock-history icon fs-1 text-warning"></i>
+                        <h3 class="mt-2">Auta w 24h</h3>
+                        <h3><strong>{{ stats['cars_on_parking_last_24h'] }}</strong></h3>
+                    </div>
+                </div>
+            </div>
+            <h1 class="text-center my-5">Wykres aktywności</h1>
+            <div id="parking-chart" class="card rounded shadow-sm"></div>
+            {% if stats['cars_on_parking'] > 0 %}
+                <h1 class="text-center my-5">Pojazdy na parkingu</h1>
+                <div class="card rounded shadow-sm">
+                    <ul id="cars-list" class="list-group list-group-flush">
+                        {% for reg in stats['cars_on_parking_registrations'] %}
+                            <li class="list-group-item fs-3 d-flex justify-content-between d-none">
+                                <span>{{ reg[0] }}</span>
+                                <span><i class="bi bi-box-arrow-in-right text-primary"></i> {{ reg[1] }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <button id="show-more" class="btn btn-primary m-3">Pokaż więcej</button>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    #parking-chart {
+        border-radius: 15px;
+        overflow: hidden;
+        height: 500px;
+    }
+</style>
+
+
+<script>
+    const plotData = {{ plot_json | safe }};
+    Plotly.newPlot('parking-chart', plotData.data, plotData.layout);
+
+    document.addEventListener('DOMContentLoaded', () => {
+    const items = document.querySelectorAll('#cars-list .list-group-item');
+    const showMoreButton = document.getElementById('show-more');
+    let visibleCount = 10;
+
+    const showItems = () => {
+        items.forEach((item, index) => {
+            if (index < visibleCount) {
+                item.classList.remove('d-none');
+            }
+        });
+
+        if (visibleCount >= items.length) {
+            showMoreButton.style.display = 'none';
+        }
+    };
+
+    showMoreButton.addEventListener('click', () => {
+        visibleCount += 10;
+        showItems();
+    });
+
+    showItems();
+});
+</script>
+
+{% endblock %}
