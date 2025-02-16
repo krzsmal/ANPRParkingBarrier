@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block title %}Karty{% endblock %}
+
+{% block content %}
+<div class="container flex-grow-1">
+    <div class="row justify-content-center mt-5 mb-3">
+        <div class="col-md-6">
+            <h1 class="text-center">Powiąż kartę z rejestracją</h1>
+            <p class="text-center">Wybierz opcję poniżej, aby sprawdzić powiązania lub dodać nowe dane.</p>
+
+            <div id="checkForm" class="form-container card shadow-sm mt-5">
+                <div class="card-header p-0">
+                    <div class="btn-group w-100" role="group">
+                        <button type="button" class="btn btn-primary w-50 custom-left-button" id="checkButton">Sprawdź powiązania</button>
+                        <button type="button" class="btn btn-secondary w-50 custom-right-button" id="addButton">Dodaj nowe powiązanie</button>
+                    </div>
+                </div>
+                <form method="POST" class="p-4 bg-light rounded">
+                    <input type="hidden" name="action" value="select">
+                    <div class="mb-3">
+                        <label for="cardNumberView" class="form-label">Numer karty płatniczej</label>
+                        <input type="text" pattern="\d{12}" name="cardNumber" class="form-control" id="cardNumberView" placeholder="1234-5678-9012" maxlength="12">
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Sprawdź powiązania</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="addForm" class="form-container d-none card shadow-sm mt-5">
+                <div class="card-header p-0">
+                    <div class="btn-group w-100" role="group">
+                        <button type="button" class="btn btn-secondary w-50 custom-left-button" id="checkButton2">Sprawdź powiązania</button>
+                        <button type="button" class="btn btn-success w-50 custom-right-button" id="addButton2">Dodaj nowe powiązanie</button>
+                    </div>
+                </div>
+                <form method="POST" class="p-4 bg-light rounded">
+                    <input type="hidden" name="action" value="insert">
+                    <div class="mb-3">
+                        <label for="cardNumberAdd" class="form-label">Numer karty płatniczej</label>
+                        <input type="text" pattern="\d{12}" name="cardNumber" class="form-control" id="cardNumberAdd" placeholder="1234-5678-9012" maxlength="12">
+                    </div>
+                    <div class="mb-3">
+                        <label for="plateNumberAdd" class="form-label">Numer rejestracyjny</label>
+                        <input type="text" name="plateNumber" class="form-control" id="plateNumberAdd" placeholder="ERA75TM" maxlength="8" oninput="this.value = this.value.toUpperCase();">
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-success">Dodaj powiązanie</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {% if request.method == 'POST'%}
+        {% if action %}
+            {% if action == 'delete' %}
+                {% if success %}
+                    <p class="text-center text-success">Usunięto powiązanie</p>
+                {% else %}
+                    <p class="text-center text-danger">Podane powiązanie nie istnieje</p>
+                {% endif %}
+            {% elif action == 'insert' %}
+                {% if success %}
+                    <p class="text-center text-success">Dodano nowe powiązanie</p>
+                {% else %}
+                    <p class="text-center text-danger">Podane powiązanie już istnieje</p>
+                {% endif %}
+            {% elif action == 'select' %}
+                {% if registrations %}
+                    <hr class="mt-5" style="margin-bottom: 23px;">
+                    <div class="row justify-content-center">
+                        <div class="col-md-8">
+                            <div class="alert text-center fs-4" role="alert">Powiązane rejestracje</div>
+                            {% for registration in registrations %}
+                                <div class="card my-3">
+                                    <div class="card-body no-padding shadow-sm d-flex justify-content-between align-items-center">
+                                        <h5 class="card-body no-margin">{{ registration }}</h5>
+                                        <form method="POST" style="display:inline;">
+                                            <input type="hidden" name="plateNumber" value="{{ registration }}">
+                                            <input type="hidden" name="action" value="delete">
+                                            <button type="submit" class="badge bg-danger fs-6 text-decoration-none border-0">Usuń powiązanie <i class="bi bi-trash3-fill"></i></button>
+                                        </form>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% else %}
+                    <p class="text-center text-danger mt-3">Brak powiązanych numerów rejestracyjnych dla tej karty płatniczej.</p>
+                {% endif %}
+            {% endif %}
+        {% endif %}
+    {% endif %}
+</div>
+
+<style>
+    .custom-left-button {
+        border-top-left-radius: 0.5rem !important;
+        border-top-right-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
+        border-bottom-left-radius: 0 !important;
+    }
+
+    .custom-right-button {
+        border-top-right-radius: 0.5rem !important;
+        border-top-left-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
+        border-bottom-left-radius: 0 !important;
+    }
+
+    .no-padding {
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+    }
+
+    .no-margin {
+        margin: 0 !important;
+    }
+
+</style>
+
+<script>
+    document.getElementById('checkButton').addEventListener('click', function() {
+        document.getElementById('checkForm').classList.remove('d-none');
+        document.getElementById('addForm').classList.add('d-none');
+    });
+
+    document.getElementById('addButton').addEventListener('click', function() {
+        document.getElementById('addForm').classList.remove('d-none');
+        document.getElementById('checkForm').classList.add('d-none');
+    });
+
+    document.getElementById('checkButton2').addEventListener('click', function() {
+        document.getElementById('checkForm').classList.remove('d-none');
+        document.getElementById('addForm').classList.add('d-none');
+    });
+
+    document.getElementById('addButton2').addEventListener('click', function() {
+        document.getElementById('addForm').classList.remove('d-none');
+        document.getElementById('checkForm').classList.add('d-none');
+    });
+</script>
+
+{% endblock %}
