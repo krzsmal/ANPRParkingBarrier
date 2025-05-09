@@ -100,6 +100,9 @@ This project implements an Automatic Number Plate Recognition (ANPR) system inte
   </tr>
 </table>
 
+## Authors
+Krzysztof Smal<br>
+Adam Pilawski
 
 ## License
 This project is licensed under the **[GNU General Public License v3.0](LICENSE)**.
